@@ -42,6 +42,17 @@ class classifEuclid(Classifier):
 # Read the data
 samples = np.genfromtxt("irisData.txt", usecols=(0, 1, 2, 3), dtype=float)  # 150x4 Matrix
 labels = np.genfromtxt("irisData.txt", usecols=[-1], dtype=str)             # 150x1 Matrix (Vector)
+unique = list(np.unique(labels))
+aux_labels = []
 
-print("Sample matrix dimension", samples.shape)
-print("Labels matrix dimension", labels.shape)
+for index, element in enumerate(labels):
+	aux_labels.append(unique.index(element))
+labels = aux_labels
+del aux_labels
+
+print("Sample matrix dimension:", samples.shape)
+print("Labels matrix dimension:", "(" + str(len(labels)) + ", 1)")
+
+# print(samples)
+# print(labels)
+
