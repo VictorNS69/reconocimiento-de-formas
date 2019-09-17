@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial import distance
 
 
 class Classifier:
@@ -17,6 +18,8 @@ class ClassifEuclid(Classifier):
         """Constructor de la clase
         labels: lista de etiquetas de esta clase"""
         self.labels = labels
+        self.coordinates = []
+        self.occurrences = []
         pass
 
     def fit(self, x, y):
@@ -24,8 +27,16 @@ class ClassifEuclid(Classifier):
         X: matriz numpy cada fila es un dato, cada columna una medida
         y: vector de etiquetas, tantos elementos como filas en X
         retorna objeto clasificador"""
-        self.predict(x)
-
+        self.occurrences = np.unique(self.labels, return_counts=True)
+        begin = 0
+        for e in enumerate(self.occurrences[1]):
+            self.coordinates.append((np.mean(x[begin:begin + e[1]], axis=0)))
+            begin += e[1]
+        """    
+        predict_matrix = self.predict(x)
+        labels_matrix = self.pred_label(predict_matrix)
+        self.num_aciertos(labels_matrix, self.labels)
+        """
         return self
 
     def predict(self, x):
@@ -33,12 +44,11 @@ class ClassifEuclid(Classifier):
         X: matriz numpy cada fila es un dato, cada columna una medida del vector de caracteristicas.
         Retorna una matriz, con tantas filas como datos y tantas columnas como clases tenga
         el problema, cada fila almacena los valores pertenencia de un dato a cada clase"""
-        occurrences = np.unique(self.labels, return_counts=True)
-        result = np.zeros((x.shape[0], occurrences[0].size))
-        begin = 0
-        for i, e in enumerate(occurrences[1]):
-            result[:, i] = np.divide(np.sum(x, axis=1), np.mean(np.sum(x[begin:begin+e], axis=1)))
-            begin += e
+        result = np.zeros((x.shape[0], self.occurrences[0].size))
+
+        for j in range(0, len(self.occurrences[1])):
+            for i in range(0, len(x)):
+                result[i, j] = distance.euclidean(x[i], self.coordinates[j])
 
         return result
 
@@ -47,8 +57,7 @@ class ClassifEuclid(Classifier):
         X: matriz numpy cada fila es un dato, cada columna una medida
         retorna un vector con las etiquetas de cada dato"""
         result = []
-        for e in x:
-            result.append((np.abs(e - 1)).argmin())
+        [result.append((e - 1).argmin()) for e in x]
 
         return result
 
@@ -57,9 +66,10 @@ class ClassifEuclid(Classifier):
         X: matriz de datos a clasificar
         y: vector de etiquetas correctas"""
         same_values = []
-        [same_values.append(x[i] == y[i]) for i in range(0, len(labels))]
-        num_aciertos = same_values.count(True)
-        return num_aciertos, (num_aciertos / len(x)) * 100
+        [same_values.append(x[i] == y[i]) for i in range(0, len(self.labels))]
+        number = same_values.count(True)
+
+        return number, (number / len(x)) * 100
 
 
 if __name__ == "__main__":
@@ -83,10 +93,13 @@ if __name__ == "__main__":
 
     classifEuclid = ClassifEuclid(labels)
 
-    predict = classifEuclid.predict(samples)
-    predict_label = classifEuclid.pred_label(predict)
+    classifEuclid.fit(samples, labels)
 
-    num_aciertos = classifEuclid.num_aciertos(predict_label, labels)
+    predict_matrix = classifEuclid.predict(samples)
 
-    print("Correct answers:", num_aciertos[0], "/", len(labels))
-    print("Success rate:", num_aciertos[1])
+    labels_matrix = classifEuclid.pred_label(predict_matrix)
+
+    correct = classifEuclid.num_aciertos(labels_matrix, labels)
+
+    print("Correct answers:", correct[0], "/", len(labels))
+    print("Success rate:", correct[1])
