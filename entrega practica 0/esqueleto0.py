@@ -32,11 +32,7 @@ class ClassifEuclid(Classifier):
         for e in enumerate(self.occurrences[1]):
             self.coordinates.append((np.mean(x[begin:begin + e[1]], axis=0)))
             begin += e[1]
-        """    
-        predict_matrix = self.predict(x)
-        labels_matrix = self.pred_label(predict_matrix)
-        self.num_aciertos(labels_matrix, self.labels)
-        """
+
         return self
 
     def predict(self, x):
@@ -73,7 +69,9 @@ class ClassifEuclid(Classifier):
 
 
 if __name__ == "__main__":
-    # Load the data
+    # --------------- Iris database ---------------
+    print("Iris database")
+
     samples = np.genfromtxt("irisData.txt", usecols=(0, 1, 2, 3), dtype=float)  # 150x4 Matrix
     labels = np.genfromtxt("irisData.txt", usecols=[-1], dtype=str)             # 150x1 Matrix (Vector)
 
@@ -85,8 +83,8 @@ if __name__ == "__main__":
     labels = aux_labels
     del aux_labels
 
-    print("Sample matrix dimension:", samples.shape)
-    print("Labels matrix dimension:", "(" + str(len(labels)) + ", 1)")
+    print("\tSample matrix dimension:", samples.shape)
+    print("\tLabels matrix dimension:", "(" + str(len(labels)) + ", 1)")
 
     # print("samples:", samples)
     # print("labels:", labels)
@@ -101,5 +99,5 @@ if __name__ == "__main__":
 
     correct = classifEuclid.num_aciertos(labels_matrix, labels)
 
-    print("Correct answers:", correct[0], "/", len(labels))
-    print("Success rate:", correct[1])
+    print("\tCorrect answers:", correct[0], "/", len(labels))
+    print("\tSuccess rate:", correct[1])
