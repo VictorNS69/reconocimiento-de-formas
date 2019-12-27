@@ -103,5 +103,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# Diagrams
+*.tree.dot
+
 # pycharm
 .idea/
